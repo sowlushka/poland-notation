@@ -1,0 +1,52 @@
+:root{
+    --form-max-width: 700px;
+    --form-min-width: 300px;
+    --form-padding: 10px;
+}
+
+
+body{
+    background-color: rgb(245, 245, 229);
+}
+
+h1{
+    text-align: center;
+}
+
+form{
+    margin: 10px auto;
+    padding: 10px;
+    max-width: var(--form-max-width);
+    min-width: var(--form-min-width);
+    border: 1px solid rgb(128, 128, 128);
+    border-radius: 5px;
+}
+
+label{
+   /*display: inline-block;*/
+   text-align: center;
+   margin: 3px 0px;
+   
+}
+
+#expression{
+    flex-grow: 1;
+    width: 95%;
+}
+
+.input-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+   
+    flex-grow: 1;
+    margin: 10px 0px;
+}
+
+.expression-result{
+    max-width: var(--form-max-width);
+    min-width: var(--form-min-width);
+    margin: 10px auto;
+    padding: 10px;
+    text-align: center;
+}
