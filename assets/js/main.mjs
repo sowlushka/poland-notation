@@ -37,20 +37,23 @@ function getPolandExpression(strExpr){
     for(let i=0;i<stream.length;++i){
         if(priority[stream[i]]){
         //Очередной элемент выражения является оператором
-            if(!stack.length || stream[i]=="(" || priority[stack[stack.length-1]]<priority[stream[i]]){
+            if(!stack.length || stream[i]=="(" || priority[stack[stack.length-1]]<=priority[stream[i]]){
             //Стек пуст или открывающая скобка или приоритет операций в стеке ниже текущего
                 stack.push(stream[i]);
             }
             else{
             //В стеке находятся операции с бОльшим или равным приоритетом. Извлекаем их в выходную строку
-                let operator;
-                do{
-                    operator=stack.pop();
-                    if(operator!="("){
+                for(let j=stack.length;j>=0;--j){
+                    let operator=stack[stack.length-1];
+                    if(priority[operator]>priority[stream[i]]){
                         result.push(operator);
+                        stack.pop();
+                    }else if(operator=="(" && stream[i]==")"){
+                        stack.pop();//Удаляем из стека открывающуюся скобку
+                        break;
                     }
 
-                } while(stack.length>0 && priority[operator]>priority[stream[i]]);
+                }
                 if(stream[i]!=")")stack.push(stream[i]);//Операцию заносим в стек
             }
         }else{
