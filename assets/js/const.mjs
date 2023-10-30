@@ -1,5 +1,5 @@
 //Объект приоритетов для операторов
-export const operators={
+export const priority={
     "(":1,
     ")":1,
     "+":2,
