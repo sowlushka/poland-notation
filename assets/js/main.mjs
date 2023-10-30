@@ -15,7 +15,11 @@ function startExpressionParse(){
     let str=document.querySelector('input').value;// Получаем строку для разбора
 
     let plExpr=getPolandExpression(str);
-    document.querySelector('.expression-result').innerHTML=plExpr;
+    let html=`
+    <div>Выражение в польской нотации: ${plExpr.join(" ")}</div>
+    <div>Результат: ${calcPolandExpression(plExpr)}</div>
+    `;
+    document.querySelector('.expression-result').innerHTML=html;
 
 }
 
@@ -28,42 +32,74 @@ function getPolandExpression(strExpr){
 
     let stream=str.match(/([^\s+\-*\/\^)(]+)|([+\-*\/\^)(])/g);//Получаем поток аргументов и операторов
 
-    /*
-    let args=str.match(/[^\s+\-*\/\^]+/g);//Массив операндов
-    let oprtr=str.match(/[+\-*\/\^)(]/g);//Массив операторов
-    */
-
     let stack=[];
-    let strResult=[];
+    let result=[];
     for(let i=0;i<stream.length;++i){
         if(priority[stream[i]]){
         //Очередной элемент выражения является оператором
-            if(!stack.length || priority[stack[stack.length-1]]<priority[stream[i]]){
-            //Стек пуст или приоритет операций в стеке ниже текущего
+            if(!stack.length || stream[i]=="(" || priority[stack[stack.length-1]]<priority[stream[i]]){
+            //Стек пуст или открывающая скобка или приоритет операций в стеке ниже текущего
                 stack.push(stream[i]);
             }
             else{
-            //В стеке находятся операции с бОльшим приоритетом. Извлекаем их в выходную строку
-                for(;stack.length>0;){
-                    if(priority[stack[stack.length-1]]>priority[stream[i]]){
-                        strResult.push(stack.pop());
-                    }else{
-                    //Встретился оператор с тем же или меньшим приоритетом
-                        break;
+            //В стеке находятся операции с бОльшим или равным приоритетом. Извлекаем их в выходную строку
+                let operator;
+                do{
+                    operator=stack.pop();
+                    if(operator!="("){
+                        result.push(operator);
                     }
-                }
-                stack.push(stream[i]);//Операцию заносим в стек
+
+                } while(stack.length>0 && priority[operator]>priority[stream[i]]);
+                if(stream[i]!=")")stack.push(stream[i]);//Операцию заносим в стек
             }
         }else{
         //Элемент выражения является аргументом
-            strResult.push(stream[i]);
+            result.push(stream[i]);
         }
     }
 
     for(;stack.length>0;){
     //Освобождаем стек
-        strResult.push(stack.pop());
+        result.push(stack.pop());
     }
 
-    return strResult.join(" ");
+    return result;
+}
+
+function calcPolandExpression(expr){
+//Вычисление выражений, записанных в польской нотации
+    let stack=[];
+    expr.forEach(el=>{
+        if(priority[el]){
+        //Получен оператор
+            if(isNaN(stack[stack.length-1]) || isNaN(stack[stack.length-2])){
+            //Численное решение невозможно
+                stack.push(el);
+            }else{
+                let arg2=Number(stack.pop());
+                switch(el){
+                    case "+":
+                        stack[stack.length-1]+=arg2;
+                        break;
+                    case "-":
+                        stack[stack.length-1]-=arg2;
+                        break;
+                    case "*":
+                        stack[stack.length-1]*=arg2;
+                        break;
+                    case "/":
+                        stack[stack.length-1]/=arg2;
+                        break;
+                    case "^":
+                        stack[stack.length-1]**=arg2;
+                        break;
+                }
+            }       
+        }else{
+        //получен аргумент
+            stack.push(el);
+        }
+    });
+    return stack.join(" ");
 }
