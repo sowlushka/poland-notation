@@ -45,15 +45,15 @@ function getPolandExpression(strExpr){
             //В стеке находятся операции с бОльшим или равным приоритетом. Извлекаем их в выходную строку
                 for(let j=stack.length;j>=0;--j){
                     let operator=stack[stack.length-1];
-                    if(priority[operator]>priority[stream[i]]){
-                        result.push(operator);
-                        stack.pop();
-                    }else if(operator=="(" && stream[i]==")"){
+                    if(operator=="(" && stream[i]==")"){
                         stack.pop();//Удаляем из стека открывающуюся скобку
                         break;
+                    } else if(priority[operator]>=priority[stream[i]]){
+                        result.push(operator);
+                        stack.pop();
                     }
-
                 }
+
                 if(stream[i]!=")")stack.push(stream[i]);//Операцию заносим в стек
             }
         }else{
@@ -80,7 +80,7 @@ function calcPolandExpression(expr){
             //Численное решение невозможно
                 stack.push(el);
             }else{
-                let arg2=Number(stack.pop());
+                let arg2=stack.pop();
                 switch(el){
                     case "+":
                         stack[stack.length-1]+=arg2;
@@ -101,7 +101,12 @@ function calcPolandExpression(expr){
             }       
         }else{
         //получен аргумент
-            stack.push(el);
+            if(isNaN(el)){
+                stack.push(el);
+            }else{
+                stack.push(+el);
+            }
+            
         }
     });
     return stack.join(" ");
